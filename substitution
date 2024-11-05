@@ -54,7 +54,7 @@ int main(int argc, string argv[])
         else
             cyphertext[i] = text[i];
     }
-    cyphertext[text_length + 1] = '\0';
+    cyphertext[text_length] = '\0';
 
     // this outputs the enciphered text
     printf("cyphertext:%s\n", cyphertext);
