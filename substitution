@@ -1,0 +1,132 @@
+#include <cs50.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
+
+int error_check(int arglength, string key);
+int main(int argc, string argv[])
+
+// this program requires you to run ./substitution
+// with a command argument of key
+// key requirements are 26 letters that don't repeat
+// no numbers allowed in key
+
+// key will be used to encipher a user defined text string
+{
+    string key = argv[1];
+
+    // this specifies what the error is with the key
+    int error_type = error_check(argc, key);
+    string text;
+    if (error_type == 0)
+        text = get_string("plaintext: ");
+    else if  (error_type == 1)
+        printf("Usage:./substitution key\n");
+    else if (error_type == 2)
+        printf("Key must contain 26 characters.\n");
+    else if (error_type == 3)
+        printf("Key must include all letters.\n");
+    else if (error_type == 4)
+        printf("Key must not repeat letters.\n");
+
+    if (error_type != 0)
+        return (1);
+
+    // this enciphers the text by replacing the original letter
+    // with the letters in the key
+    int key_length = strlen(key);
+    int text_length = strlen(text);
+
+    char cyphertext[text_length];
+
+    for (int i = 0; i < text_length; i++)
+    {
+        if(text[i] >= 'a' && text[i] <= 'z')
+            {
+            int index = text[i] - 'a';
+            cyphertext[i] = tolower(key[index]);
+            }
+        else if (text[i] >= 'A' && text[i] <= 'Z')
+            {
+            int index = text[i] - 'A';
+            cyphertext[i] = toupper(key[index]);
+            }
+        else
+            cyphertext[i] = text[i];
+    }
+    cyphertext[text_length + 1] = '\0';
+
+    // this outputs the enciphered text
+    printf("cyphertext:%s\n", cyphertext);
+}
+
+int error_check(int arglength, string key)
+{
+    // checks there are proper number of arguments (2)
+    int arglength_error;
+    if (arglength == 2)
+        arglength_error = 0;
+    else
+        {
+        arglength_error = 1;
+        return (1);
+        }
+
+    // checks the number of characters in key
+    int keylength_error;
+    int keylength = strlen(key);
+    if (keylength == 26)
+        keylength_error = 0;
+    else
+        keylength_error = 1;
+
+    // checks that all characters in key are letters
+    int lettercount_error;
+    int lettercount = 0;
+    for (int i = 0; i < keylength; i++)
+    {
+        if ((key[i] >= 'a' && key[i] <= 'z') || (key[i] >= 'A' && key[i] <= 'Z'))
+            lettercount++;
+    }
+    if (lettercount == 26)
+        lettercount_error = 0;
+    else
+        lettercount_error = 1;
+
+    // checks if there are any repeating letters
+    int repeat_count = 0;
+
+    if (lettercount_error == 0)
+    {
+        char lowercase_key[keylength];
+        for (int i = 0; i < keylength; i++)
+            lowercase_key[i] = tolower(key[i]);
+        for (int i = 0; i < keylength; i++)
+        {
+            for (int j = i + 1; j < keylength - i - 1; j++)
+            {
+                if (lowercase_key[i] == lowercase_key[j])
+                    repeat_count++;
+            }
+        }
+    }
+
+    int repeat_error;
+    if (repeat_count == 0)
+        repeat_error = 0;
+    else
+        repeat_error = 1;
+
+    int totalerrors = keylength_error + arglength_error + lettercount_error + repeat_error;
+
+    if (totalerrors == 0)
+        return (0);
+    else if (lettercount_error == 1)
+        return (2);
+    else if (keylength_error == 1)
+        return (3);
+    else if (repeat_error == 1)
+        return (4);
+    else
+        return (5);
+}
